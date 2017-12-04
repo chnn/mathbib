@@ -1,0 +1,11 @@
+[package]
+name = "mathbib"
+version = "0.1.0"
+authors = ["Christopher Henn <chris@chrishenn.net>"]
+
+[dependencies]
+clap = "2.28.0"
+reqwest = "0.8.1"
+scraper = "0.4.0"
+url = "1.6.0"
+regex = "0.2"
