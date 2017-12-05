@@ -15,6 +15,8 @@ use regex::Regex;
 use scraper::{Html, Selector, ElementRef};
 use url::percent_encoding::{utf8_percent_encode, DEFAULT_ENCODE_SET};
 
+const MAX_LINE_LENGTH: usize = 99;
+
 struct BibTeXReference {
     authors: String,
     title: String,
@@ -60,8 +62,20 @@ fn main() {
 
     println!("Found {} articles: \n", bib_refs.len());
 
-    for (i, bib_ref) in bib_refs.iter().enumerate() {
-        println!("{}. {}", i, bib_ref.to_string());
+    for (id, bib_ref) in bib_refs.iter().enumerate().map(|(i, b)| (i + 1, b)) {
+        let title_author = bib_ref.to_string();
+
+        let id_label = if id < 10 {
+            format!(" {}", id).bold()
+        } else {
+            format!("{}", id).bold()
+        };
+
+        if title_author.len() > MAX_LINE_LENGTH - 7 {
+            println!("{}. {}...", id_label, &title_author[0..MAX_LINE_LENGTH - 7])
+        } else {
+            println!("{}. {}", id_label, title_author)
+        };
     }
 
     print!("\nSelect an article: ");
@@ -72,7 +86,7 @@ fn main() {
     io::stdin().read_line(&mut selection_input).unwrap();
 
     let selection: usize = selection_input.trim().parse().unwrap();
-    let selected_ref: &BibTeXReference = bib_refs.get(selection)
+    let selected_ref: &BibTeXReference = bib_refs.get(selection - 1)
         .expect("Invalid selection.");
 
     let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
